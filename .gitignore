@@ -4,6 +4,9 @@
 *.obj
 *.elf
 
+# XML
+*.xml
+
 # Precompiled Headers
 *.gch
 *.pch
