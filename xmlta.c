@@ -20,7 +20,7 @@ static void XMLCALL
 		int i;
 		long address;
 		int size, hwords;
-		uint32 fAddress
+		uint32_t fAddress;
 		for (;attr[i]; i+= 2) {
 			if (strcmp(attr[i], "address") == 0) {
 				address = strtol(attr[i + 1], NULL, 16);
@@ -31,7 +31,7 @@ static void XMLCALL
 				continue;
 			}
 		}
-		fAddress = (uint32)(address && 0xFFFFFFFF);
+		fAddress = (uint32_t)(address & 0xFFFFFFFF);
 		if (size < 2) {
 			fprintf(outFile, "lbui	r20, r0, %i\n", fAddress);
 		} else {
@@ -50,9 +50,8 @@ static void XMLCALL
 				}
 			}
 		}
+	}
 }
-
-
 
 int main(int argc, char *argv[])
 {
@@ -87,7 +86,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	XML_Parser p_ctrl = XML_ParserCreate("UTF-8")
+	XML_Parser p_ctrl = XML_ParserCreate("UTF-8");
 	if (!p_ctrl) {
 		fprintf(stderr, "Could not create XML parser.\n");
 		exit(-1);
@@ -96,7 +95,7 @@ int main(int argc, char *argv[])
 	XML_SetStartElementHandler(p_ctrl, starthandler);
 	
 	do {
-		long len = fread(buffer, 1, sizeof(data), inFile);
+		long len = fread(buffer, 1, sizeof(buffer), inFile);
 		done = len < sizeof(buffer);
 
 		if (XML_Parse(p_ctrl, buffer, len, 0) == 0) {
@@ -111,7 +110,7 @@ int main(int argc, char *argv[])
 		}
 	} while(!done);
 
-	XML_ParseFree(p_ctrl);
+	XML_ParserFree(p_ctrl);
 	if (inFileStr) {
 		fclose(inFile);
 	}
