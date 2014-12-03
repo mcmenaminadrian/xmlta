@@ -12,9 +12,51 @@ FILE *outFile;
 char *inFileStr = NULL;
 char *outFileStr = NULL;
 
+static void XMLCALL
+	starthandler(void *data, const XML_Char *name, const XML_Char **attr)
+{
+	if (strcmp(name, "instruction") == 0||strcmp(name, "load") == 0) {
+		//lwi command
+		int i;
+		long address;
+		int size, hwords;
+		uint32 fAddress
+		for (;attr[i]; i+= 2) {
+			if (strcmp(attr[i], "address") == 0) {
+				address = strtol(attr[i + 1], NULL, 16);
+				continue;
+			}
+			if (strcmp(attr[i], "size") == 0) {
+				size = strtol(attr[i + 1], NULL, 16);
+				continue;
+			}
+		}
+		fAddress = (uint32)(address && 0xFFFFFFFF);
+		if (size < 2) {
+			fprintf(outFile, "lbui	r20, r0, %i\n", fAddress);
+		} else {
+			if (size%4) {
+				hwords = size / 2 + 1;
+				for (i = 0; i < hwords; i++) {
+					fprintf(outFile,
+						"lhui	r20, r0, %i\n",
+						fAddress + i * 2);
+				}
+			} else {
+				for (int i = 0; i < size; i += 4) {
+					fprintf(outFile,
+						"lwi	r20, r0, %i\n",
+						fAddress + i);
+				}
+			}
+		}
+}
+
+
+
 int main(int argc, char *argv[])
 {
-	int i;
+	int i, done;
 	inFile = stdin;
 	outFile = stdout;
 
@@ -54,10 +96,10 @@ int main(int argc, char *argv[])
 	XML_SetStartElementHandler(p_ctrl, starthandler);
 	
 	do {
-		len = fread(data, 1, sizeof(data), inFile);
-		done = len < sizeof(data);
+		long len = fread(buffer, 1, sizeof(data), inFile);
+		done = len < sizeof(buffer);
 
-		if (XML_Parse(p_ctrl, data, len, 0) == 0) {
+		if (XML_Parse(p_ctrl, buffer, len, 0) == 0) {
 			enum XML_Error errcode = XML_GetErrorCode(p_ctrl);
 			fprintf(stderr, "XML ERROR: %s\n",
 				XML_ErrorString(errcode));
