@@ -21,7 +21,7 @@ static void XMLCALL
 		long address;
 		int size, hwords;
 		uint32_t fAddress;
-		for (;attr[i]; i+= 2) {
+		for (i = 0;attr[i]; i+= 2) {
 			if (strcmp(attr[i], "address") == 0) {
 				address = strtol(attr[i + 1], NULL, 16);
 				continue;
@@ -31,7 +31,7 @@ static void XMLCALL
 				continue;
 			}
 		}
-		fAddress = (uint32_t)(address & 0xFFFFFFFF);
+		fAddress = (uint32_t)(address & 0xFFFFFFFE);
 		if (size < 2) {
 			fprintf(outFile, "lbui	r20, r0, %i\n", fAddress);
 		} else {
