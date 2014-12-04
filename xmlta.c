@@ -32,23 +32,69 @@ static void XMLCALL
 			}
 		}
 		fAddress = (uint32_t)(address & 0xFFFFFFFE);
-		if (size < 2) {
-			fprintf(outFile, "lbui	r20, r0, %i\n", fAddress);
-		} else {
-			if (size%4) {
-				hwords = size / 2 + 1;
-				for (i = 0; i < hwords; i++) {
-					fprintf(outFile,
-						"lhui	r20, r0, %i\n",
-						fAddress + i * 2);
-				}
-			} else {
-				for (int i = 0; i < size; i += 4) {
-					fprintf(outFile,
-						"lwi	r20, r0, %i\n",
-						fAddress + i);
-				}
-			}
+		switch (size) {
+			case 0:
+			break;
+
+			case 1:
+			fprintf(outFile, "lbui	r20, r0, %#x\n", fAddress);
+			break;
+
+			case 2:
+			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress);
+			break;
+
+			case 3:
+			case 4:
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			break;
+
+			case 5:
+			case 6:
+			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 2);
+			break;
+
+			case 7:
+			case 8:
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 4);
+			break;
+
+			case 9:
+			case 10:
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress + 8);
+			break;
+
+			case 11:
+			case 12:
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 8);
+			break;
+
+			case 13:
+			case 14:
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 8);
+			fprintf(outFile, 
+				"lhui	r20, r0, %#x\n", fAddress + 12);
+			break;
+
+			case 15:
+			case 16:
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 8);
+			fprintf(outFile, 
+				"lwi	r20, r0, %#x\n", fAddress + 12);
+			break;
+
+			default:
+			break;
 		}
 	}
 }
