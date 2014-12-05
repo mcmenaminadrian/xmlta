@@ -31,16 +31,18 @@ static void XMLCALL
 				continue;
 			}
 		}
-		fAddress = (uint32_t)(address & 0xFFFFFFFE);
+		fAddress = (unint32_t)(address & 0xFFFFFFFC
 		switch (size) {
 			case 0:
 			break;
 
 			case 1:
+			fAddress = (uint32_t)(address & 0xFFFFFFFF);
 			fprintf(outFile, "sbui	r20, r0, %#x\n", fAddress);
 			break;
 
 			case 2:
+			fAddress = (uint32_t)(address & 0xFFFFFFFE);
 			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress);
 			break;
 
@@ -51,8 +53,8 @@ static void XMLCALL
 
 			case 5:
 			case 6:
-			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress);
-			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 2);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress + 4);
 			break;
 
 			case 7:
@@ -97,16 +99,18 @@ static void XMLCALL
 				continue;
 			}
 		}
-		fAddress = (uint32_t)(address & 0xFFFFFFFE);
+		fAddress = (uint32_t)(address & 0xFFFFFFFC);
 		switch (size) {
 			case 0:
 			break;
 
 			case 1:
+			fAddress = (uint32_t)(address & 0xFFFFFFFF);
 			fprintf(outFile, "lbui	r20, r0, %#x\n", fAddress);
 			break;
 
 			case 2:
+			fAddress = (uint32_t)(address & 0xFFFFFFFE);
 			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress);
 			break;
 
@@ -117,8 +121,8 @@ static void XMLCALL
 
 			case 5:
 			case 6:
-			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress);
-			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 2);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress + 4);
 			break;
 
 			case 7:
@@ -163,7 +167,7 @@ static void XMLCALL
 			break;
 		}
 	}
-	if (strcmp(name, "modify") == 0||strcmp(name, "load") == 0) {
+	if (strcmp(name, "modify") == 0) {
 		for (i = 0;attr[i]; i+= 2) {
 			if (strcmp(attr[i], "address") == 0) {
 				address = strtol(attr[i + 1], NULL, 16);
@@ -174,17 +178,19 @@ static void XMLCALL
 				continue;
 			}
 		}
-		fAddress = (uint32_t)(address & 0xFFFFFFFE);
+		fAddress = (uint32_t)(address & 0xFFFFFFFC);
 		switch (size) {
 			case 0:
 			break;
 
 			case 1:
+			fAddress = (uint32_t)(address & 0xFFFFFFFF);
 			fprintf(outFile, "lbui	r20, r0, %#x\n", fAddress);
 			fprintf(outFile, "sbui	r20, r0, %#x\n", fAddress);
 			break;
 
 			case 2:
+			fAddress = (uint32_t)(address & 0xFFFFFFFE);
 			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress);
 			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress);
 			break;
@@ -197,10 +203,10 @@ static void XMLCALL
 
 			case 5:
 			case 6:
-			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress);
-			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 2);
-			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress);
-			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 2);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress + 4);
 			break;
 
 			case 7:
@@ -263,7 +269,6 @@ static void XMLCALL
 			break;
 		}
 	}
-
 }
 
 int main(int argc, char *argv[])
@@ -306,6 +311,8 @@ int main(int argc, char *argv[])
 	}
 
 	XML_SetStartElementHandler(p_ctrl, starthandler);
+
+	fprintf(outFile, ".set 0xE0000000 \n");
 	
 	do {
 		long len = fread(buffer, 1, sizeof(buffer), inFile);
@@ -322,6 +329,7 @@ int main(int argc, char *argv[])
 			exit(-1);
 		}
 	} while(!done);
+	fprintf(outFile, "rtsd	r15, 0x04\n");
 
 	XML_ParserFree(p_ctrl);
 	if (inFileStr) {
