@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <expat.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -15,13 +16,11 @@ char *outFileStr = NULL;
 static void XMLCALL
 	starthandler(void *data, const XML_Char *name, const XML_Char **attr)
 {
+	int i, size = 0;
+	uint32_t fAddress;
+	long address = 0;
 
 	if (strcmp(name, "store") == 0) {
-		//lwi command
-		int i;
-		long address;
-		int size;
-		uint32_t fAddress;
 		for (i = 0;attr[i]; i+= 2) {
 			if (strcmp(attr[i], "address") == 0) {
 				address = strtol(attr[i + 1], NULL, 16);
@@ -88,11 +87,6 @@ static void XMLCALL
 	}
 
 	if (strcmp(name, "instruction") == 0||strcmp(name, "load") == 0) {
-		//lwi command
-		int i;
-		long address;
-		int size;
-		uint32_t fAddress;
 		for (i = 0;attr[i]; i+= 2) {
 			if (strcmp(attr[i], "address") == 0) {
 				address = strtol(attr[i + 1], NULL, 16);
@@ -170,11 +164,6 @@ static void XMLCALL
 		}
 	}
 	if (strcmp(name, "modify") == 0||strcmp(name, "load") == 0) {
-		//lwi command
-		int i;
-		long address;
-		int size;
-		uint32_t fAddress;
 		for (i = 0;attr[i]; i+= 2) {
 			if (strcmp(attr[i], "address") == 0) {
 				address = strtol(attr[i + 1], NULL, 16);
