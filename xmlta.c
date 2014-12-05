@@ -31,7 +31,7 @@ static void XMLCALL
 				continue;
 			}
 		}
-		fAddress = (unint32_t)(address & 0xFFFFFFFC
+		fAddress = (uint32_t)(address & 0xFFFFFFFC);
 		switch (size) {
 			case 0:
 			break;
