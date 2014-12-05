@@ -316,10 +316,10 @@ int main(int argc, char *argv[])
 
 	XML_SetStartElementHandler(p_ctrl, starthandler);
 
-	fprintf(outFile, ".org 0x80000000 \n");
-	fprintf(outFile, ".global generated_traffic\n");
 	fprintf(outFile, ".align 4\n");
 	fprintf(outFile, "generated_traffic:\n");
+	fprintf(outFile, "addik	r1, r1, -4\n");
+	fprintf(outFile, "sw	r15, r1, r0\n");
 	
 	do {
 		long len = fread(buffer, 1, sizeof(buffer), inFile);
@@ -335,8 +335,10 @@ int main(int argc, char *argv[])
 				XML_GetCurrentLineNumber(p_ctrl));
 			exit(-1);
 		}
-	} while(!done && count < 1000);
+	} while(!done && count < 100000);
+	fprintf(outFile, "lw	r15, r1, r0\n");
 	fprintf(outFile, "rtsd	r15, 0x04\n");
+	fprintf(outFile, "addik	r1, r1, 0x04\n");
 
 	XML_ParserFree(p_ctrl);
 	if (inFileStr) {
