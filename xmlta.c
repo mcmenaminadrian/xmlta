@@ -15,11 +15,83 @@ char *outFileStr = NULL;
 static void XMLCALL
 	starthandler(void *data, const XML_Char *name, const XML_Char **attr)
 {
+
+	if (strcmp(name, "store") == 0) {
+		//lwi command
+		int i;
+		long address;
+		int size;
+		uint32_t fAddress;
+		for (i = 0;attr[i]; i+= 2) {
+			if (strcmp(attr[i], "address") == 0) {
+				address = strtol(attr[i + 1], NULL, 16);
+				continue;
+			}
+			if (strcmp(attr[i], "size") == 0) {
+				size = strtol(attr[i + 1], NULL, 16);
+				continue;
+			}
+		}
+		fAddress = (uint32_t)(address & 0xFFFFFFFE);
+		switch (size) {
+			case 0:
+			break;
+
+			case 1:
+			fprintf(outFile, "sbui	r20, r0, %#x\n", fAddress);
+			break;
+
+			case 2:
+			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress);
+			break;
+
+			case 3:
+			case 4:
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			break;
+
+			case 5:
+			case 6:
+			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 2);
+			break;
+
+			case 7:
+			case 8:
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 4);
+			break;
+
+			case 9:
+			case 10:
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress + 8);
+			break;
+
+			case 11:
+			case 12:
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 8);
+			break;
+
+			case 13:
+			case 14:
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 8);
+			fprintf(outFile, 
+				"shui	r20, r0, %#x\n", fAddress + 12);
+			break;
+		}
+	}
+
 	if (strcmp(name, "instruction") == 0||strcmp(name, "load") == 0) {
 		//lwi command
 		int i;
 		long address;
-		int size, hwords;
+		int size;
 		uint32_t fAddress;
 		for (i = 0;attr[i]; i+= 2) {
 			if (strcmp(attr[i], "address") == 0) {
@@ -97,6 +169,112 @@ static void XMLCALL
 			break;
 		}
 	}
+	if (strcmp(name, "modify") == 0||strcmp(name, "load") == 0) {
+		//lwi command
+		int i;
+		long address;
+		int size;
+		uint32_t fAddress;
+		for (i = 0;attr[i]; i+= 2) {
+			if (strcmp(attr[i], "address") == 0) {
+				address = strtol(attr[i + 1], NULL, 16);
+				continue;
+			}
+			if (strcmp(attr[i], "size") == 0) {
+				size = strtol(attr[i + 1], NULL, 16);
+				continue;
+			}
+		}
+		fAddress = (uint32_t)(address & 0xFFFFFFFE);
+		switch (size) {
+			case 0:
+			break;
+
+			case 1:
+			fprintf(outFile, "lbui	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "sbui	r20, r0, %#x\n", fAddress);
+			break;
+
+			case 2:
+			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress);
+			break;
+
+			case 3:
+			case 4:
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			break;
+
+			case 5:
+			case 6:
+			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 2);
+			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 2);
+			break;
+
+			case 7:
+			case 8:
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 4);
+			break;
+
+			case 9:
+			case 10:
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress + 8);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress + 8);
+			break;
+
+			case 11:
+			case 12:
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 8);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 8);
+			break;
+
+			case 13:
+			case 14:
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 8);
+			fprintf(outFile, 
+				"lhui	r20, r0, %#x\n", fAddress + 12);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 8);
+			fprintf(outFile, 
+				"shui	r20, r0, %#x\n", fAddress + 12);
+			break;
+
+			case 15:
+			case 16:
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress + 8);
+			fprintf(outFile, 
+				"lwi	r20, r0, %#x\n", fAddress + 12);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 8);
+			fprintf(outFile, 
+				"swi	r20, r0, %#x\n", fAddress + 12);
+			break;
+
+			default:
+			break;
+		}
+	}
+
 }
 
 int main(int argc, char *argv[])
