@@ -85,7 +85,7 @@ static void XMLCALL
 			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 4);
 			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 8);
 			fprintf(outFile, 
-				"shui	r20, r0, %#x\n", fAddress + 12);
+				"shi	r20, r0, %#x\n", fAddress + 12);
 			break;
 		}
 	}
@@ -335,7 +335,7 @@ int main(int argc, char *argv[])
 				XML_GetCurrentLineNumber(p_ctrl));
 			exit(-1);
 		}
-	} while(!done && count < 100000);
+	} while(!done && count < 200000);
 	fprintf(outFile, "lw	r15, r1, r0\n");
 	fprintf(outFile, "rtsd	r15, 0x04\n");
 	fprintf(outFile, "addik	r1, r1, 0x04\n");
@@ -350,4 +350,3 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-	
