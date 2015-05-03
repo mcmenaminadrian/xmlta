@@ -210,7 +210,7 @@ static void XMLCALL
 			fprintf(outFile, "lwi	r20, r0, %#x\n", fAddress);
 			fprintf(outFile, "lhui	r20, r0, %#x\n", fAddress + 4);
 			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress);
-			fprintf(outFile, "shui	r20, r0, %#x\n", fAddress + 4);
+			fprintf(outFile, "shi	r20, r0, %#x\n", fAddress + 4);
 			break;
 
 			case 7:
@@ -252,7 +252,7 @@ static void XMLCALL
 			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 4);
 			fprintf(outFile, "swi	r20, r0, %#x\n", fAddress + 8);
 			fprintf(outFile, 
-				"shui	r20, r0, %#x\n", fAddress + 12);
+				"shi	r20, r0, %#x\n", fAddress + 12);
 			break;
 
 			case 15:
